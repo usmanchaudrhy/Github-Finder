@@ -1,1 +1,1 @@
-Github Finder Project, Tutorial Project by Brad Traversery.
+Github Finder Project, can be used to search for Github users.
