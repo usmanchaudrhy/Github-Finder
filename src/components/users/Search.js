@@ -1,46 +1,56 @@
-import React, {Component} from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
+import GithubContext from '../context/github/githubContext';
 
-export default class Search extends Component{
-    
-    state = {
-        text: ""
-    }
+const Search = (props) => {
 
-    static propTypes = {
-        searchUsers : PropTypes.func.isRequired,
-        clearUsers : PropTypes.func.isRequired,
-        showClear : PropTypes.bool.isRequired,
-        setAlert : PropTypes.func.isRequired
-    }
+    const githubContext = useContext(GithubContext);
+    /**
+     * useState Hook is used to set and change a state variable in Functional Components
+     */
+    const [text, setText] = useState('');
 
-    onChange = (e) => this.setState({ [e.target.name]: e.target.value});
+    /**
+     * Add const to functions, as this is no longer a class componenet
+     * Functions within functions will have const before them
+     */
+    const onChange = (e) => setText(e.target.value);
 
-    onSubmit = (e) => {
+    /**
+     * Because this is not a regular form submit, we need to do e.preventDefault()
+     */
+    const onSubmit = (e) => {
         e.preventDefault();
-        if(this.state.text ===''){
-            this.props.setAlert('Please Enter Something', 'light');
+        if (text === '') {
+            props.setAlert('Please Enter Something', 'light');
         } else {
-            this.props.searchUsers(this.state.text);
-            this.setState({
-                text:''
-            })
+            githubContext.searchUsers(text);
+            setText('');
         }
     }
-    
-    render(){
-        return(
-            <div>
-                <form onSubmit={this.onSubmit} className="form">
-                    <input type="text" name='text' onChange={this.onChange} value={this.state.text} placeholder='Search Users....'/>
-                    <input type="submit" value="Search" className="btn btn-dark btn-block"/>
-                </form>
-                {this.props.showClear && (
-                    <button className="btn btn-light btn-block" onClick={this.props.clearUsers}>
-                        Clear
-                    </button>
-                )}
-            </div>
-        );
-    }
+
+    /**
+     * Functional components do not require the render() function, 
+     * state variables in Functional componenets are not accessed by this.state but by their name
+     */
+    return (
+        <div>
+            <form onSubmit={onSubmit} className="form">
+                <input type="text" name='text' onChange={onChange} value={text} placeholder='Search Users....' />
+                <input type="submit" value="Search" className="btn btn-dark btn-block" />
+            </form>
+            {githubContext.users.length > 0 && (
+                <button className="btn btn-light btn-block" onClick={githubContext.clearUsers}>
+                    Clear
+                </button>
+            )}
+        </div>
+    );
+
 }
+
+Search.propTypes = {
+    setAlert: PropTypes.func.isRequired
+}
+
+export default Search;
